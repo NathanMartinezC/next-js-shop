@@ -2,6 +2,7 @@ import { Grid, Typography, Box, Button, Chip } from "@mui/material";
 import { ShopLayout } from "@/components/layouts";
 import { initialData } from "@/database/products";
 import { ProductSlideshow } from "@/components/products";
+import { ItemCounter } from "@/components/ui";
 
 const product = initialData.products[0];
 
@@ -19,6 +20,7 @@ const ProductPage = () => {
 
                         <Box sx={{ my: 2 }}>
                             <Typography variant="subtitle2">Quantity</Typography>
+                            <ItemCounter />
                         </Box>
 
                         <Button color="secondary" className="circular-btn">
