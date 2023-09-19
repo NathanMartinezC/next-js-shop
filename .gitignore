@@ -33,3 +33,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+mongo/
+.env
+env_files/.mongo-express.env
+env_files/.mongodb.env

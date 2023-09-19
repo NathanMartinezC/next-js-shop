@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  shop_mongodb:
+    image: mongo:latest
+    container_name: shop_mongodb
+    restart: always
+    env_file:
+      - env_files/.mongodb.env
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongo:/data/db
+    networks:
+      shop-mongo-network:
+        aliases:
+          - shop_mongodb
+  
+  shop_mongo_express:
+    container_name: shop_mongo_express
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    env_file:
+      - env_files/.mongo-express.env
+    networks:
+      shop-mongo-network:
+        aliases:
+          - shop_mongo_express
+
+networks:
+  shop-mongo-network:
