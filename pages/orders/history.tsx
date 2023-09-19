@@ -28,7 +28,7 @@ const columns: GridColDef[] = [
         renderCell: (params: GridRenderCellParams) => {
             return (
                 <NextLink href={`/orders/${ params.row.id }`} passHref>
-                    <Link underline="always">
+                    <Link underline="always" component={"span"}>
                         Order
                     </Link>
                 </NextLink>
