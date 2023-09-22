@@ -1,10 +1,9 @@
-import { NextPage, GetServerSideProps } from "next";
+import { NextPage, GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
 import { Grid, Typography, Box, Button, Chip } from "@mui/material";
 import { ShopLayout } from "@/components/layouts";
 import { ProductSlideshow, SizeSelector } from "@/components/products";
 import { ItemCounter } from "@/components/ui";
 import { IProduct } from "@/interfaces";
-import exp from "constants";
 import { dbProducts } from "@/database";
 
 
@@ -51,7 +50,41 @@ const ProductPage:NextPage<Props> = ({ product }) => {
     )
 }
 
-export const getServerSideProps:GetServerSideProps = async ({ params }) => {
+// Server Side Rendering - OK  but not optimal
+// export const getServerSideProps:GetServerSideProps = async ({ params }) => {
+    
+//     const { slug = '' } = params as { slug: string };
+//     const product = await dbProducts.getProductBySlug(slug);
+
+//     if (!product) {
+//         return {
+//             redirect: {
+//                 destination: '/',
+//                 permanent: false
+//             }
+//         }
+//     }
+
+//     return {
+//         props: {
+//             product
+//         }
+//     }
+// }
+
+export const getStaticPaths:GetStaticPaths = async (ctx) => {
+
+    const productSlugs = await dbProducts.getAllProductSlugs();
+
+    return {
+        paths: productSlugs.map( ({ slug }) => ({
+            params: { slug }
+        })),
+        fallback: "blocking"
+    }
+}
+
+export const getStaticProps:GetStaticProps = async ({ params }) => {
     
     const { slug = '' } = params as { slug: string };
     const product = await dbProducts.getProductBySlug(slug);
@@ -68,7 +101,8 @@ export const getServerSideProps:GetServerSideProps = async ({ params }) => {
     return {
         props: {
             product
-        }
+        },
+        revalidate: 60 * 60 * 24 // 24 hours
     }
 }
 
