@@ -8,6 +8,12 @@ type CartActionType =
     | { type: '[CART] - LOAD FROM COOKIE', payload: ICartProduct[] }
     | { type: '[CART] - UPDATE QUANTITY', payload: ICartProduct }
     | { type: '[CART] - REMOVE PRODUCT', payload: ICartProduct }
+    | { type: '[CART] - UPDATE SUMMARY', payload: {
+        numberOfItems: number;
+        subTotal: number;
+        tax: number;
+        total: number;
+    } }
 
 export const cartReducer = (state: CartState, action: CartActionType): CartState => {
     switch (action.type) {
@@ -41,6 +47,11 @@ export const cartReducer = (state: CartState, action: CartActionType): CartState
                     if ( product._id === action.payload._id && product.size === action.payload.size ) return false;
                     return true;
                 })
+            }
+        case '[CART] - UPDATE SUMMARY':
+            return {
+                ...state,
+                ...action.payload
             }
 
         default:

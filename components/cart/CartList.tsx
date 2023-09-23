@@ -49,7 +49,7 @@ export const CartList: FC<Props> = ({ editable = false}) => {
                                         <ItemCounter 
                                             currentValue={ product.quantity }
                                             maxValue={ 5 }
-                                            updatedQuantity={() => onNewQuantity(product, product.quantity)}
+                                            updatedQuantity={(value) => onNewQuantity(product, value)}
                                         />
                                     ) : (
                                         <Typography variant="h5">{ product.quantity } items</Typography>

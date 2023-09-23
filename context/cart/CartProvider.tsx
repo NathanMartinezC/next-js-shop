@@ -7,10 +7,18 @@ import { CartContext, cartReducer } from '.';
 
 export interface CartState {
     cart: ICartProduct[];
+    numberOfItems: number;
+    subTotal: number;
+    tax: number;
+    total: number;
 }
 
 const CART_INITIAL_STATE: CartState = {
     cart: [],
+    numberOfItems: 0,
+    subTotal: 0,
+    tax: 0,
+    total: 0
 };
 
 export const CartProvider: FC<PropsWithChildren> = ({ children }) => {
@@ -19,7 +27,6 @@ export const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
     useEffect(() => {
         try{
-            const x = JSON.parse(Cookie.get('cart')!)
             const cookieProducts = Cookie.get('cart') ? JSON.parse(Cookie.get('cart')!) : [];
             dispatch({ type: '[CART] - LOAD FROM COOKIE', payload: cookieProducts });
         } catch (error) {
@@ -30,6 +37,22 @@ export const CartProvider: FC<PropsWithChildren> = ({ children }) => {
     useEffect(() => {
         if (state.cart.length === 0 ) return;
         Cookie.set('cart', JSON.stringify(state.cart));
+    }, [state.cart]);
+
+    useEffect(() => {
+        const numberOfItems = state.cart.reduce( (prev, current) => current.quantity + prev, 0);
+        const subTotal = state.cart.reduce( (prev, current) => current.price * current.quantity + prev, 0);
+        const taxRate = Number(process.env.NEXT_PUBLIC_TAX_RATE || 0.15);
+        const tax = subTotal * taxRate;
+
+        const orderSummary = {
+            numberOfItems,
+            subTotal,
+            tax,
+            total: subTotal + tax
+        }
+        console.log("SUMMARY:", orderSummary)
+        dispatch({ type: '[CART] - UPDATE SUMMARY', payload: orderSummary });
     }, [state.cart]);
 
     const addProductToCart = (product: ICartProduct) => {
