@@ -13,7 +13,7 @@ interface Props {
 
 export const CartList: FC<Props> = ({ editable = false}) => {
 
-    const { cart, updateCartQuantity } = useContext(CartContext);
+    const { cart, updateCartQuantity, removeProductFromCart } = useContext(CartContext);
 
     const onNewQuantity = (product: ICartProduct, newQuantity: number) => {
         product.quantity = newQuantity;
@@ -61,7 +61,11 @@ export const CartList: FC<Props> = ({ editable = false}) => {
                             <Typography variant="subtitle1">${`${ product.price }`}</Typography>
                             {
                                 editable && (
-                                    <Button variant="text" color='secondary'>
+                                    <Button 
+                                        variant="text" 
+                                        color='secondary'
+                                        onClick={() => removeProductFromCart(product)}
+                                    >
                                         Remove
                                     </Button>
                                 )

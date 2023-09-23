@@ -19,6 +19,7 @@ export const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
     useEffect(() => {
         try{
+            const x = JSON.parse(Cookie.get('cart')!)
             const cookieProducts = Cookie.get('cart') ? JSON.parse(Cookie.get('cart')!) : [];
             dispatch({ type: '[CART] - LOAD FROM COOKIE', payload: cookieProducts });
         } catch (error) {
@@ -27,6 +28,7 @@ export const CartProvider: FC<PropsWithChildren> = ({ children }) => {
     }, []);
 
     useEffect(() => {
+        if (state.cart.length === 0 ) return;
         Cookie.set('cart', JSON.stringify(state.cart));
     }, [state.cart]);
 
@@ -53,11 +55,17 @@ export const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         dispatch({ type: '[CART] - UPDATE QUANTITY', payload: product });
     }
 
+    const removeProductFromCart = (product: ICartProduct) => {
+        dispatch({ type: '[CART] - REMOVE PRODUCT', payload: product });
+    }
+
     return (
         <CartContext.Provider value={{ 
             ...state,
             addProductToCart,
             updateCartQuantity,
+            removeProductFromCart
+
         }}>
             { children }
         </CartContext.Provider>
