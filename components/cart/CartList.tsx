@@ -1,32 +1,36 @@
-import { FC } from "react"
+import { FC, useContext } from "react"
 import NextLink from "next/link"
 import { Grid, Card, Link, CardActionArea, CardMedia, Box, Typography, Button } from "@mui/material"
-import { initialData } from "@/database/products"
 import { ItemCounter } from "../ui"
+import { CartContext } from "@/context";
+import { ICartProduct } from "@/interfaces";
+import { on } from "events";
 
-const productsInCart = [
-    initialData.products[0],
-    initialData.products[1],
-    initialData.products[2],
-]
 
 interface Props {
     editable?: boolean;
 }
 
 export const CartList: FC<Props> = ({ editable = false}) => {
+
+    const { cart, updateCartQuantity } = useContext(CartContext);
+
+    const onNewQuantity = (product: ICartProduct, newQuantity: number) => {
+        product.quantity = newQuantity;
+        updateCartQuantity(product);  
+    }
     return (
         <>
             {
-                productsInCart.map((product) => (
-                    <Grid container spacing={2} key={ product.slug } sx={{ mb: 1 }}>
+                cart.map((product) => (
+                    <Grid container spacing={2} key={ product.slug + product.size } sx={{ mb: 1 }}>
                         <Grid item xs={3}>
-                            <NextLink href="/product/slug" passHref>
+                            <NextLink href={`/product/${ product.slug }`} passHref>
                                 <Link component={"span"}>
                                     <CardActionArea>
                                         <CardMedia
                                             component="img"
-                                            image={ `/products/${ product.images[0] }` }
+                                            image={ `/products/${ product.image }` }
                                             alt={ product.slug }
                                             sx={{ borderRadius: '5px' }}
                                         />
@@ -41,8 +45,15 @@ export const CartList: FC<Props> = ({ editable = false}) => {
 
                                 {
                                     editable
-                                    ? <ItemCounter />
-                                    : <Typography variant="body1">1 item</Typography>
+                                    ? (
+                                        <ItemCounter 
+                                            currentValue={ product.quantity }
+                                            maxValue={ 5 }
+                                            updatedQuantity={() => onNewQuantity(product, product.quantity)}
+                                        />
+                                    ) : (
+                                        <Typography variant="h5">{ product.quantity } items</Typography>
+                                    )
                                 }
                             </Box>
                         </Grid>
