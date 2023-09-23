@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcryptjs';
 import { db } from '@/database';
 import { User } from '@/models';
-import { jwt } from '@/utils.ts';
+import { jwt, validations } from '@/utils.ts';
 
 type Data = 
 | { message: string }
@@ -39,6 +39,10 @@ const registerUser = async( req: NextApiRequest, res: NextApiResponse<Data> ) =>
     
     if ( name.length < 2 ) {
         return res.status(401).json({ message: 'Name must be at least 2 characters' });
+    }
+
+    if ( validations.isEmail( email ) ) {
+        return res.status(401).json({ message: 'Invalid email' });
     }
     
     
