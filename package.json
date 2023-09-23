@@ -25,5 +25,8 @@
     "react-slideshow-image": "^4.2.1",
     "swr": "^2.2.2",
     "typescript": "5.2.2"
+  },
+  "devDependencies": {
+    "@types/js-cookie": "^3.0.4"
   }
 }
