@@ -1,17 +1,35 @@
+import { useState } from "react";
 import { NextPage, GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
 import { Grid, Typography, Box, Button, Chip } from "@mui/material";
 import { ShopLayout } from "@/components/layouts";
 import { ProductSlideshow, SizeSelector } from "@/components/products";
 import { ItemCounter } from "@/components/ui";
-import { IProduct } from "@/interfaces";
+import { IProduct, ICartProduct, ISize } from "@/interfaces";
 import { dbProducts } from "@/database";
-
 
 interface Props {
     product: IProduct
 }
 
 const ProductPage:NextPage<Props> = ({ product }) => {
+
+    const [tempCartProduct, setTempCartProduct] = useState<ICartProduct>({
+        _id: product._id,
+        image: product.images[0],
+        price: product.price,
+        size: undefined,
+        slug: product.slug,
+        title: product.title,
+        gender: product.gender,
+        quantity: 1
+    })
+
+    const selectedSize = (size: ISize) => {
+        setTempCartProduct({
+            ...tempCartProduct,
+            size
+        })
+    }
 
     return (
         <ShopLayout title={ product.title } pageDescription={ product.description }>
@@ -29,6 +47,8 @@ const ProductPage:NextPage<Props> = ({ product }) => {
                             <ItemCounter />
                             <SizeSelector 
                                 sizes={ product.sizes }
+                                selectedSize={ tempCartProduct.size }
+                                onSelectedSize={(size) => selectedSize(size)}
                             />
                         </Box>
 
@@ -36,7 +56,11 @@ const ProductPage:NextPage<Props> = ({ product }) => {
                             (product.inStock > 0)
                             ? (
                                 <Button color="secondary" className="circular-btn">
-                                    Add to cart
+                                    {
+                                        tempCartProduct.size
+                                            ? 'Add to Cart'
+                                            : 'Select a size'
+                                    }
                                 </Button>
                             ) : (
                                     <Chip label="No available" color="error" variant="outlined" />
