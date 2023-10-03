@@ -35,7 +35,8 @@ const Login = () => {
             return
         }
 
-        router.push('/');
+        const destination = router.query.p?.toString() || '/';
+        router.push(destination);
         
     }
 

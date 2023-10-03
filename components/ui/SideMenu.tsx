@@ -1,5 +1,5 @@
 import { useContext, useState } from "react"
-import { Box, Divider, Drawer, IconButton, Input, InputAdornment, List, ListItem, ListItemIcon, ListItemText, ListSubheader } from "@mui/material"
+import { Box, Divider, Drawer, IconButton, Input, InputAdornment, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader } from "@mui/material"
 import { AccountCircleOutlined, AdminPanelSettings, CategoryOutlined, ConfirmationNumberOutlined, EscalatorWarningOutlined, FemaleOutlined, LoginOutlined, MaleOutlined, SearchOutlined, VpnKeyOutlined } from "@mui/icons-material"
 import { AuthContext, UIContext } from "@/context"
 import { useRouter } from "next/router"
@@ -9,7 +9,7 @@ export const SideMenu = () => {
 
     const router = useRouter();
     const { isMenuOpen, toggleSideMenu } = useContext(UIContext);
-    const { user, isLoggedIn } = useContext(AuthContext);
+    const { user, isLoggedIn, logout } = useContext(AuthContext);
 
     const [searchTerm, setSearchTerm] = useState('')
 
@@ -112,20 +112,20 @@ export const SideMenu = () => {
                 {
                     isLoggedIn 
                     ? (
-                        <ListItem button>
+                        <ListItemButton onClick={ logout }>
                             <ListItemIcon>
                                 <LoginOutlined/>
                             </ListItemIcon>
                             <ListItemText primary={'Salir'} />
-                        </ListItem>
+                        </ListItemButton>
                     )
                     : (
-                        <ListItem button>
+                        <ListItemButton onClick={()=>navigateTo(`/auth/login?p=${ router.asPath }`)}>
                             <ListItemIcon>
                                 <VpnKeyOutlined/>
                             </ListItemIcon>
                             <ListItemText primary={'Ingresar'} />
-                        </ListItem>
+                        </ListItemButton>
                     )
                 }
 
