@@ -98,7 +98,10 @@ const Login = () => {
                         </Grid>
 
                         <Grid item xs={12} display="flex" justifyContent="end">
-                            <NextLink href="/auth/register" passHref>
+                            <NextLink 
+                                href={router.query.p ? `/auth/register?p=${router.query.p}`: `/auth/register`} 
+                                passHref
+                            >
                                 <Link underline='always' component={'span'}>
                                     Do you have an account? Register
                                 </Link>
