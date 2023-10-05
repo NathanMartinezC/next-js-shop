@@ -21,21 +21,21 @@ export const OrderSummary = () => {
                 <Typography>Subtotal</Typography>
             </Grid>
             <Grid item xs={6} display="flex" justifyContent="end">
-                <Typography>${ currency.format(subTotal) }</Typography>
+                <Typography>{ currency.format(subTotal) }</Typography>
             </Grid>
 
             <Grid item xs={6}>
                 <Typography>Taxes</Typography>
             </Grid>
             <Grid item xs={6} display="flex" justifyContent="end">
-                <Typography>${ currency.format(tax) }</Typography>
+                <Typography>{ currency.format(tax) }</Typography>
             </Grid>
 
             <Grid item xs={6} sx={{ mt: 2 }}>
                 <Typography variant="subtitle1">Total</Typography>
             </Grid>
             <Grid item xs={6} sx={{ mt: 2 }} display="flex" justifyContent="end">
-                <Typography variant="subtitle1">${ currency.format(total) }</Typography>
+                <Typography variant="subtitle1">{ currency.format(total) }</Typography>
             </Grid>
         </Grid>
     )

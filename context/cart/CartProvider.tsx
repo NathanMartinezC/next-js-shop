@@ -12,6 +12,18 @@ export interface CartState {
     subTotal: number;
     tax: number;
     total: number;
+    shippingAddress?: ShippingAddress;
+}
+
+export interface ShippingAddress {
+    firstName: string;
+    lastName: string;
+    address: string;
+    address2?: string;
+    postalCode: string;
+    city: string;
+    country: string;
+    phone: string;
 }
 
 const CART_INITIAL_STATE: CartState = {
@@ -20,7 +32,8 @@ const CART_INITIAL_STATE: CartState = {
     numberOfItems: 0,
     subTotal: 0,
     tax: 0,
-    total: 0
+    total: 0,
+    shippingAddress: undefined
 };
 
 export const CartProvider: FC<PropsWithChildren> = ({ children }) => {
@@ -35,6 +48,23 @@ export const CartProvider: FC<PropsWithChildren> = ({ children }) => {
             dispatch({ type: '[CART] - LOAD FROM COOKIE', payload: [] });
         }
     }, []);
+
+    useEffect(() => {
+        if ( Cookie.get('firstName') ) {
+            const shippingAddress = {
+                firstName: Cookie.get('firstName') || '',
+                lastName: Cookie.get('lastName') || '',
+                address: Cookie.get('address') || '',
+                address2: Cookie.get('address2') || '',
+                postalCode: Cookie.get('postalCode') || '',
+                city: Cookie.get('city') || '',
+                country: Cookie.get('country') || '',
+                phone: Cookie.get('phone') || ''
+            }
+            dispatch({ type: '[CART] - LOAD ADDRESS FROM COOKIE', payload: shippingAddress })
+        }
+    }, []);
+
 
     useEffect(() => {
         if (state.cart.length === 0 ) return;
@@ -53,7 +83,6 @@ export const CartProvider: FC<PropsWithChildren> = ({ children }) => {
             tax,
             total: subTotal + tax
         }
-        console.log("SUMMARY:", orderSummary)
         dispatch({ type: '[CART] - UPDATE SUMMARY', payload: orderSummary });
     }, [state.cart]);
 
@@ -84,12 +113,25 @@ export const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         dispatch({ type: '[CART] - REMOVE PRODUCT', payload: product });
     }
 
+    const updateAddress = ( address : ShippingAddress ) => {
+        Cookie.set('firstName', address.firstName);
+        Cookie.set('lastName', address.lastName);
+        Cookie.set('address', address.address);
+        Cookie.set('address2', address.address2 || '');
+        Cookie.set('postalCode', address.postalCode);
+        Cookie.set('city', address.city);
+        Cookie.set('country', address.country);
+        Cookie.set('phone', address.phone);
+        dispatch({ type: '[CART] - UPDATE ADDRESS', payload: address });
+    }
+
     return (
         <CartContext.Provider value={{ 
             ...state,
             addProductToCart,
             updateCartQuantity,
-            removeProductFromCart
+            removeProductFromCart,
+            updateAddress,
 
         }}>
             { children }

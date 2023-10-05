@@ -5,6 +5,8 @@ import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField
 import { countries, jwt } from "@/utils.ts";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
+import { useContext } from "react";
+import { CartContext } from "@/context";
 
 
 type FormData = {
@@ -18,34 +20,31 @@ type FormData = {
     phone: string;
 }
 
+const getAddressFromCookies = ():FormData => {
+    return {
+        firstName: Cookies.get('firstName') || '',
+        lastName: Cookies.get('lastName') || '',
+        address: Cookies.get('address') || '',
+        address2: Cookies.get('address2') || '',
+        postalCode: Cookies.get('postalCode') || '',
+        city: Cookies.get('city') || '',
+        country: Cookies.get('country') || '',
+        phone: Cookies.get('phone') || ''
+    }
+}
+
 
 const AddressPage = () => {
 
     const router = useRouter();
+    const { updateAddress } = useContext(CartContext);
+    
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
-        defaultValues: {
-            firstName: '',
-            lastName: '',
-            address: '',
-            address2: '',
-            postalCode: '',
-            city: '',
-            country: '',
-            phone: ''
-        }
+        defaultValues: getAddressFromCookies()
     });
 
     const onSubmitAddress = (data: FormData) => {
-        console.log(data);
-        Cookies.set('firstName', data.firstName);
-        Cookies.set('lastName', data.lastName);
-        Cookies.set('address', data.address);
-        Cookies.set('address2', data.address2 || '');
-        Cookies.set('postalCode', data.postalCode);
-        Cookies.set('city', data.city);
-        Cookies.set('country', data.country);
-        Cookies.set('phone', data.phone);
-
+        updateAddress(data);
         router.push('/checkout/summary');
     }
 
@@ -131,10 +130,10 @@ const AddressPage = () => {
                     <Grid item xs={ 12 } sm={ 6 }>
                         <FormControl fullWidth>
                             <TextField
-                            select
+                                select
                                 variant="filled"
                                 label="Country"
-                                defaultValue={ countries[0].code }
+                                defaultValue={ Cookies.get('country') || countries[0].code }
                                 { ...register('country', {
                                     required: 'Country is required'
                                 })}
