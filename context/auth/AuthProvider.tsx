@@ -1,3 +1,4 @@
+import { useSession, signOut } from 'next-auth/react';
 import { FC, useReducer, PropsWithChildren, useEffect } from 'react';
 import { IUser } from '@/interfaces';
 import Cookies from 'js-cookie';
@@ -20,12 +21,16 @@ const AUTH_INITIAL_STATE: AuthState = {
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
     const [state, dispatch] = useReducer(authReducer, AUTH_INITIAL_STATE);
+    const { data, status } = useSession();
     const router = useRouter();
 
     useEffect(() => {
-        checkToken();
-    }, []);
-
+        if (status === 'authenticated') {
+            console.log(data);
+            dispatch({ type:'[Auth] - Login', payload: data?.user as IUser });
+        }
+    }, [data, status]);
+    
     const checkToken = async() => {
 
         if ( !Cookies.get('token') ) return;
@@ -78,7 +83,6 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     }
 
     const logout = () => {
-        Cookies.remove('token');
         Cookies.remove('cart');
         Cookies.remove('firstName');
         Cookies.remove('lastName');
@@ -88,7 +92,10 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         Cookies.remove('city');
         Cookies.remove('country');
         Cookies.remove('phone');
-        router.reload();
+        
+        signOut();
+        // router.reload();
+        // Cookies.remove('token');
     }
 
     return (
