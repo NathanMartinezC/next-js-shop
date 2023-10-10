@@ -5,8 +5,9 @@ import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField
 import { countries, jwt } from "@/utils.ts";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
-import { useContext } from "react";
+import { use, useContext, useEffect, useState } from "react";
 import { CartContext } from "@/context";
+import { get } from "http";
 
 
 type FormData = {
@@ -28,7 +29,7 @@ const getAddressFromCookies = ():FormData => {
         address2: Cookies.get('address2') || '',
         postalCode: Cookies.get('postalCode') || '',
         city: Cookies.get('city') || '',
-        country: Cookies.get('country') || '',
+        country: Cookies.get('country') || countries[0].code,
         phone: Cookies.get('phone') || ''
     }
 }
@@ -39,9 +40,17 @@ const AddressPage = () => {
     const router = useRouter();
     const { updateAddress } = useContext(CartContext);
     
-    const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>({
         defaultValues: getAddressFromCookies()
     });
+
+    const [ defaultCountry, setDefaultCountry ] = useState('');
+
+    useEffect(() =>{
+        const addressFromCookies = getAddressFromCookies();
+        reset(addressFromCookies);
+        setDefaultCountry(addressFromCookies.country);
+    }, [ reset, getAddressFromCookies ]);
 
     const onSubmitAddress = (data: FormData) => {
         updateAddress(data);
@@ -129,27 +138,32 @@ const AddressPage = () => {
 
                     <Grid item xs={ 12 } sm={ 6 }>
                         <FormControl fullWidth>
-                            <TextField
-                                select
-                                variant="filled"
-                                label="Country"
-                                defaultValue={ Cookies.get('country') || countries[0].code }
-                                { ...register('country', {
-                                    required: 'Country is required'
-                                })}
-                                error={ !!errors.country }
-                            >
-                                {
-                                    countries.map( country => (
-                                        <MenuItem 
-                                            key={country.code}
-                                            value={country.code}
-                                        >
-                                            {country.name}
-                                        </MenuItem>
-                                    ))
-                                }
-                            </TextField>
+                            {
+                                !!defaultCountry && (
+                                    <TextField
+                                        select
+                                        variant="filled"
+                                        label="Country"
+                                        defaultValue={ defaultCountry }
+                                        { ...register('country', {
+                                            required: 'Country is required'
+                                        })}
+                                        error={ !!errors.country }
+                                        helperText={errors.country?.message}
+                                    >
+                                        {
+                                            countries.map( country => (
+                                                <MenuItem 
+                                                    key={country.code}
+                                                    value={country.code}
+                                                >
+                                                    {country.name}
+                                                </MenuItem>
+                                            ))
+                                        }
+                                    </TextField>
+                                )
+                            }
                         </FormControl>
                     </Grid>
                     <Grid item xs={ 12 } sm={ 6 }>
@@ -178,30 +192,30 @@ const AddressPage = () => {
     )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-    const { token = '' } = req.cookies;
-    let isValidToken = false;
+// export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+//     const { token = '' } = req.cookies;
+//     let isValidToken = false;
 
-    try {
-        await jwt.isJWTValid(token);
-        isValidToken = true;
-    } catch (error) {
-        isValidToken = false;
-    }
+//     try {
+//         await jwt.isJWTValid(token);
+//         isValidToken = true;
+//     } catch (error) {
+//         isValidToken = false;
+//     }
 
-    if ( !isValidToken ) {
-        return {
-            redirect: {
-                destination: '/auth/login?p=/checkout/address',
-                permanent: false
-            }
-        }
-    }
-    return {
-        props: {}
-    }
+//     if ( !isValidToken ) {
+//         return {
+//             redirect: {
+//                 destination: '/auth/login?p=/checkout/address',
+//                 permanent: false
+//             }
+//         }
+//     }
+//     return {
+//         props: {}
+//     }
 
-}
+// }
 
 
 export default AddressPage;
