@@ -1,8 +1,9 @@
-import { FC, useReducer, PropsWithChildren, useEffect, use } from 'react';
+import { FC, useReducer, PropsWithChildren, useEffect } from 'react';
 import Cookie from 'js-cookie';
 
-import { ICartProduct } from '@/interfaces';
+import { ICartProduct, IOrder } from '@/interfaces';
 import { CartContext, cartReducer } from '.';
+import { shopApi } from '@/api';
 
 
 export interface CartState {
@@ -125,6 +126,33 @@ export const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         dispatch({ type: '[CART] - UPDATE ADDRESS', payload: address });
     }
 
+    const createOrder = async () => {
+
+        if (!state.shippingAddress) {
+            throw new Error('Shipping address is not defined');
+        }
+
+        const body: IOrder = {
+            orderItems: state.cart.map( p => ({
+                ...p,
+                size: p.size!,
+            })),
+            shippingAddress: state.shippingAddress,
+            numberOfItems: state.numberOfItems,
+            subTotal: state.subTotal,
+            tax: state.tax,
+            total: state.total,
+            isPaid: false,
+        }
+
+        try{
+            const { data } = await shopApi.post('/orders', body);
+            console.log(data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <CartContext.Provider value={{ 
             ...state,
@@ -132,6 +160,7 @@ export const CartProvider: FC<PropsWithChildren> = ({ children }) => {
             updateCartQuantity,
             removeProductFromCart,
             updateAddress,
+            createOrder,
 
         }}>
             { children }
