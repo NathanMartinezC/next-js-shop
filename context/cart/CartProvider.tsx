@@ -4,6 +4,7 @@ import Cookie from 'js-cookie';
 import { ICartProduct, IOrder } from '@/interfaces';
 import { CartContext, cartReducer } from '.';
 import { shopApi } from '@/api';
+import axios from 'axios';
 
 
 export interface CartState {
@@ -126,7 +127,7 @@ export const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         dispatch({ type: '[CART] - UPDATE ADDRESS', payload: address });
     }
 
-    const createOrder = async () => {
+    const createOrder = async():Promise<{ hasError: boolean; message: string; }> => {
 
         if (!state.shippingAddress) {
             throw new Error('Shipping address is not defined');
@@ -146,10 +147,26 @@ export const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         }
 
         try{
-            const { data } = await shopApi.post('/orders', body);
-            console.log(data);
+            const { data } = await shopApi.post<IOrder>('/orders', body);
+
+            dispatch({ type: '[CART] - ORDER COMPLETE' })
+            
+            return {
+                hasError: false,
+                message: data._id!
+            }
+
         } catch (error) {
-            console.log(error);
+            if ( axios.isAxiosError(error) ) {
+                return {
+                    hasError: true,
+                    message: error.response?.data.message || error.message
+                }
+            }
+            return {
+                hasError: true,
+                message: "Something went wrong"
+            }
         }
     }
 
