@@ -1,5 +1,7 @@
 import NextLink from "next/link";
 import { GetServerSideProps, NextPage } from "next";
+import { PayPalButtons } from "@paypal/react-paypal-js";
+import { OrderResponseBody } from "@paypal/paypal-js"
 import { Box, Button, Card, CardContent, Chip, Divider, Grid, Link, Typography } from "@mui/material";
 import { CartList, OrderSummary } from "@/components/cart";
 import { ShopLayout } from "@/components/layouts";
@@ -7,6 +9,8 @@ import { CreditCardOffOutlined, CreditScoreOutlined } from "@mui/icons-material"
 import { getSession } from "next-auth/react";
 import { dbOrders } from "@/database";
 import { IOrder } from "@/interfaces";
+import { shopApi } from "@/api";
+import { useRouter } from "next/router";
 
 
 interface Props {
@@ -15,7 +19,27 @@ interface Props {
 
 const OrderPage:NextPage<Props> = ({ order }) => {
 
+    const router = useRouter();
     const { shippingAddress } = order;
+
+    const onOrderCompleted = async(details: OrderResponseBody) => {
+        if (details.status !== "COMPLETED") {
+            return alert("Something went wrong with your payment");
+        }
+
+        try {
+            const { data } = await shopApi.post(`/orders/pay`, {
+                transactionId: details.id,
+                orderId: order._id
+            });
+            router.reload();
+        } catch (error) {
+            console.log(error);
+            alert("Something went wrong with your payment");
+        }
+    }
+
+
 
     return (
         <ShopLayout title="Order Summary: " pageDescription="Order Summary">
@@ -93,7 +117,24 @@ const OrderPage:NextPage<Props> = ({ order }) => {
                                             icon={ <CreditScoreOutlined /> }
                                         />
                                     ) : (
-                                        <h1>Pay</h1>
+                                        <PayPalButtons
+                                            createOrder={( data, actions ) => {
+                                                return actions.order.create({
+                                                    purchase_units: [
+                                                        {
+                                                            amount: {
+                                                                value: `${order.total}`
+                                                            }
+                                                        }
+                                                    ]
+                                                })
+                                            }}
+                                            onApprove={(data, actions) => {
+                                                return actions.order!.capture().then((details) => {
+                                                    onOrderCompleted(details);
+                                                })
+                                            }}
+                                        />
                                     )
                                 }
 
