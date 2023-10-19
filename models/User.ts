@@ -8,7 +8,7 @@ const UserSchema: Schema = new Schema({
     role: {
         type: String,
         enum: {
-            values: ["admin", "client"],
+            values: ["admin", "client", "super-user", "SEO"],
             message: "{VALUE} is not supported",
             default: "client",
             required: true,        
