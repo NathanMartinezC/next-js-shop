@@ -61,14 +61,14 @@ export const SideMenu = () => {
                                 <ListItemIcon>
                                     <AccountCircleOutlined/>
                                 </ListItemIcon>
-                                <ListItemText primary={'Perfil'} />
+                                <ListItemText primary={'Profile'} />
                             </ListItem>
 
                             <ListItem button>
                                 <ListItemIcon>
                                     <ConfirmationNumberOutlined/>
                                 </ListItemIcon>
-                                <ListItemText primary={'Mis Ordenes'} />
+                                <ListItemText primary={'My Orders'} />
                             </ListItem>
                         </>
                     )
@@ -116,7 +116,7 @@ export const SideMenu = () => {
                             <ListItemIcon>
                                 <LoginOutlined/>
                             </ListItemIcon>
-                            <ListItemText primary={'Salir'} />
+                            <ListItemText primary={'Logout'} />
                         </ListItemButton>
                     )
                     : (
@@ -124,7 +124,7 @@ export const SideMenu = () => {
                             <ListItemIcon>
                                 <VpnKeyOutlined/>
                             </ListItemIcon>
-                            <ListItemText primary={'Ingresar'} />
+                            <ListItemText primary={'Login'} />
                         </ListItemButton>
                     )
                 }
@@ -145,18 +145,18 @@ export const SideMenu = () => {
                                 <ListItemText primary={'Dashboard'} />
                             </ListItem>
 
-                            <ListItem button onClick={() => navigateTo('/orders/history')}>
+                            <ListItem button onClick={() => navigateTo('/admin/orders')}>
                                 <ListItemIcon>
                                     <ConfirmationNumberOutlined/>
                                 </ListItemIcon>
-                                <ListItemText primary={'Ordenes'} />
+                                <ListItemText primary={'Orders'} />
                             </ListItem>
 
                             <ListItem button onClick={() => navigateTo('/admin/users')}>
                                 <ListItemIcon>
                                     <AdminPanelSettings/>
                                 </ListItemIcon>
-                                <ListItemText primary={'Usuarios'} />
+                                <ListItemText primary={'Users'} />
                             </ListItem>
                         </>
                     )
